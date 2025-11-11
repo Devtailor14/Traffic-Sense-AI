@@ -4,14 +4,51 @@ import { motion } from 'framer-motion';
 
 const AboutPage: React.FC = () => {
     const teamMembers = [
-        { name: 'Dev Tailor', role: 'Full Stack Developer' },
-        { name: 'Priyadarshi Nihal', role: 'Full Stack ML Engineer' },
-        { name: 'Pratyush Dubey', role: 'AI & ML Engineer' },
-        { name: 'Dattatrey', role: 'Frontend Developer' },
-        { name: 'Shivalik Mathur', role: 'Backend Developer' },
+        { name: 'Dev Tailor', role: 'Full Stack Developer', regNo: '22BCE11250' },
+        { name: 'Priyadarshi Nihal', role: 'Full Stack ML Engineer', regNo: '22BCE10665' },
+        { name: 'Pratyush Dubey', role: 'AI & ML Engineer', regNo: '22BCE10582' },
+        { name: 'Dattatrey', role: 'Backend Developer', regNo: '22BCE11036' },
+        { name: 'Shivalik Mathur', role: 'Frontend Developer', regNo: '22BCE11223' },
     ];
 
-    const techStack = ['PyTorch', 'YOLOv8', 'YOLO-FDE', 'React', 'TypeScript', 'TailwindCSS', 'Recharts', 'Flask', 'SQLite'];
+    const techStack = [
+        // ⚙️ Core AI & ML
+        'PyTorch',
+        'Ultralytics YOLOv8',
+        'YOLO-FDE (Feature Dynamic Enhanced)',
+        'Supervision',
+        'OpenCV',
+        'NumPy',
+        'Matplotlib',
+
+        // 🧠 Backend
+        'Flask',
+        'Flask-CORS',
+        'Werkzeug',
+        'SQLite',
+        'SQLAlchemy',
+        'yt-dlp',
+        'threading',
+        'os / pathlib',
+
+        // 🌐 Frontend
+        'React',
+        'TypeScript',
+        'Vite',
+        'TailwindCSS',
+        'Framer Motion',
+        'Recharts',
+        'React Router',
+        'Lucide Icons',
+
+        // ⚡ System Integration
+        'Fetch API',
+        'FormData API',
+        'LocalStorage API',
+        'concurrently',
+        'Node.js',
+        'npm'
+    ];
 
     const milestones = [
         { date: 'Sep 2025', event: 'Dataset Preparation & Base Model (YOLOv8) Training' },
@@ -45,15 +82,16 @@ const AboutPage: React.FC = () => {
                 >
                     <h2 className="text-2xl font-bold mb-3">Our Mission</h2>
                     <p className="text-gray-600 dark:text-gray-300">
-                        TrafficSense AI is built with a vision to enable efficient, accurate, and real-time traffic monitoring for smarter roads and safer cities.
-                        Using state-of-the-art YOLO-based models, our system performs real-time vehicle detection, tracking, counting, and detailed analytics across multiple live or offline video streams.
+                        <strong>Traffic Sense AI</strong> is built with a vision to enable efficient, accurate, and real-time traffic monitoring
+                        for smarter roads and safer cities. Using state-of-the-art YOLO-based models, our system performs
+                        real-time vehicle detection, tracking, counting, and detailed analytics across multiple live or offline video streams.
                     </p>
                 </motion.div>
             </Card>
 
             {/* Team */}
             <Card>
-                <h2 className="text-2xl font-bold mb-4">Meet the Team</h2>
+                <h2 className="text-2xl font-bold mb-4 text-center">Meet the Capstone Team</h2>
                 <div className="flex flex-wrap gap-8 justify-center">
                     {teamMembers.map(member => (
                         <motion.div
@@ -70,6 +108,7 @@ const AboutPage: React.FC = () => {
                             </div>
                             <h3 className="font-semibold">{member.name}</h3>
                             <p className="text-sm text-primary-500 dark:text-primary-400">{member.role}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{member.regNo}</p>
                         </motion.div>
                     ))}
                 </div>
@@ -79,25 +118,24 @@ const AboutPage: React.FC = () => {
             <Card>
                 <h2 className="text-2xl font-bold mb-3">Acknowledgment</h2>
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                    We express our sincere gratitude to 
-                    <strong> Dr. I. Jasmine Selvakumari Jeya, Assistant Dean, VIT Bhopal</strong>, 
-                    for her valuable guidance, encouragement, and academic support throughout this project. 
-                    Her direction in selecting the YOLO-FDD research foundation and mentoring us in enhancing 
-                    and structuring the model into our improved YOLO-FDE architecture played a pivotal role 
-                    in shaping this work. We are truly grateful for her mentorship in research paper structuring, 
+                    We express our sincere gratitude to <strong>Dr. I. Jasmine Selvakumari Jeya, Assistant Dean, VIT Bhopal</strong>,
+                    for her valuable guidance, encouragement, and academic support throughout this project.
+                    Her direction in selecting the YOLO-FDD research foundation and mentoring us in enhancing
+                    and structuring the model into our improved YOLO-FDE architecture played a pivotal role
+                    in shaping this work. We are truly grateful for her mentorship in research paper structuring,
                     model evaluation methodologies, and continuous motivation.
                 </p>
             </Card>
 
             {/* Core Features */}
             <Card>
-                <h2 className="text-2xl font-bold mb-3">Core Features of TrafficSense AI</h2>
+                <h2 className="text-2xl font-bold mb-3">Core Features of Traffic Sense AI</h2>
                 <ul className="list-disc ml-6 text-gray-600 dark:text-gray-300 space-y-1">
                     <li>Real-time multi-stream inference (up to 4 videos at once)</li>
-                    <li>Accurate vehicle tracking with ByteTrack for non-duplicate counting</li>
-                    <li>YouTube, live feed & local video inference support</li>
-                    <li>Comprehensive vehicle stats & traffic analytics</li>
-                    <li>Model performance comparison & interactive dashboard</li>
+                    <li>Accurate vehicle tracking with ByteTrack-based non-duplicate counting</li>
+                    <li>Supports YouTube, live feeds, and local video inference</li>
+                    <li>Detailed traffic analytics with total & class-wise vehicle stats</li>
+                    <li>Interactive dashboard and YOLO model performance comparison</li>
                 </ul>
             </Card>
 
@@ -107,7 +145,10 @@ const AboutPage: React.FC = () => {
                     <h2 className="text-2xl font-bold mb-3">Tech Stack</h2>
                     <div className="flex flex-wrap gap-2">
                         {techStack.map(tech => (
-                            <span key={tech} className="bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                            <span
+                                key={tech}
+                                className="bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300 text-xs font-medium px-2.5 py-0.5 rounded-full"
+                            >
                                 {tech}
                             </span>
                         ))}
@@ -117,9 +158,10 @@ const AboutPage: React.FC = () => {
                 <Card>
                     <h2 className="text-2xl font-bold mb-3">What is YOLO-FDE?</h2>
                     <p className="text-gray-600 dark:text-gray-300">
-                        YOLO-FDE (Feature Dynamic Enhanced) is our custom-optimized YOLO variant designed specifically for traffic surveillance. 
-                        It improves detection consistency, mAP performance, and stability in real-world road environments by introducing enhanced 
-                        feature extraction, dynamic sampling, and refined detection heads.
+                        <strong>YOLO-FDE (Feature Dynamic Enhanced)</strong> is our custom YOLO variant designed specifically for
+                        traffic surveillance. It enhances detection accuracy, mAP performance, and robustness by integrating
+                        feature dynamic interaction heads, deformable convolution, dynamic sampling, and a refined attention-based
+                        backbone—optimizing detection across varying lighting, occlusion, and motion conditions.
                     </p>
                 </Card>
             </div>
@@ -137,18 +179,16 @@ const AboutPage: React.FC = () => {
                 </ul>
             </Card>
 
-            {/* Contact & Links */}
+            {/* Github Link */}
             <Card>
-                <h2 className="text-2xl font-bold mb-3 text-center">Contact & Links</h2>
                 <div className="flex flex-col items-center space-y-3 text-center">
-                    <a href="https://github.com/pnihal6/Traffic-Sense-AI" target="_blank" className="font-medium text-primary-600 dark:text-primary-400 hover:underline">
-                        GitHub Repository
+                    <a
+                        href="https://github.com/pnihal6/Traffic-Sense-AI"
+                        target="_blank"
+                        className="font-medium text-primary-600 dark:text-primary-400 hover:underline"
+                    >
+                        GitHub Repository Link
                     </a>
-                    <p className="text-gray-600 dark:text-gray-300 text-sm">
-                        📞 +91 9702251090<br />
-                        📧 priyadarshinihal2022@vitbhopal.ac.in<br />
-                        📧 devtailor2022@vitbhopal.ac.in
-                    </p>
                 </div>
             </Card>
         </motion.div>

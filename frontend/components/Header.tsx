@@ -24,7 +24,7 @@ const Header: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-2">
             <ModelsIcon className="h-8 w-8 text-primary-600" />
-            <span className="text-xl font-bold text-gray-800 dark:text-white">Traffic AI</span>
+            <span className="text-xl font-bold text-gray-800 dark:text-white">Traffic Sense AI</span>
           </div>
           <nav className="hidden md:flex items-center space-x-4">
             {navLinks.map(({ to, text, icon: Icon }) => (
