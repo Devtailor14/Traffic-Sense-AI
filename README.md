@@ -44,7 +44,7 @@ It features:
 
 <div align="center">
   
-  ![YOLOv8-FDE Architecture](./frontend/public/images/yolov8_fde_architecture.png)
+  ![YOLOv8-FDE Architecture](./frontend/images/yolov8_fde_architecture.png)
   
   <em>Figure: YOLOv8-FDE architecture with integrated FDIDH, DWR, DySample, and Post-SPPF Attention modules.</em>
 
@@ -156,14 +156,6 @@ This uses **concurrently** to start Flask + React simultaneously.
 ---
 
 
-
-### 🅰 FDE Architecture 
-
-![YOLO-FDE Architecture](./frontend/images/yolov8_fde_architecture.png)
-
-
-
----
 
 ## 🔗 Related Work & Research
 
