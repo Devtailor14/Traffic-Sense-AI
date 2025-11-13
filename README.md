@@ -122,7 +122,7 @@ The model integrates four critical modules:
 - **~33% fewer parameters** with superior accuracy.  
 - **Significant FPS gain** (3.5 GFLOPs only).  
 - **Robust under poor lighting, occlusion, and dense traffic.**  
-- Deployed successfully in **real-time (RTX 4060)** at **>240 FPS**.
+- Deployed successfully in **real-time (RTX 4060)** .
 
 ---
 
