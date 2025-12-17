@@ -183,7 +183,7 @@ const AboutPage: React.FC = () => {
             <Card>
                 <div className="flex flex-col items-center space-y-3 text-center">
                     <a
-                        href="https://github.com/pnihal6/Traffic-Sense-AI"
+                        href="https://github.com/Devtailor14/Traffic-Sense-AI"
                         target="_blank"
                         className="font-medium text-primary-600 dark:text-primary-400 hover:underline"
                     >
