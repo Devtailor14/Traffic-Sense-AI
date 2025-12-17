@@ -18,9 +18,11 @@ RUN npm run build
 # --- Stage 2: Build Backend & Final Image ---
 FROM python:3.11-slim
 
-# Install system dependencies (OpenCV requires libGL)
+# Install system dependencies
+# libgl1-mesa-glx is not available in Debian Bookworm (python:3.11-slim), use libgl1 instead.
+# For robust OpenCV support (even headless), usually libgl1 and libglib2.0-0 are enough.
 RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
