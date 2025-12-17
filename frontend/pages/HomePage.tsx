@@ -191,13 +191,15 @@ const HomePage: React.FC = () => {
   };
 
   const handleStartInference = async () => {
+    // choose slot
+    const slotIndex = pickFirstEmptySid();
+
     try {
       if (!selectedModel || !modelFile) {
         alert("Select a model first.");
         return;
       }
-      // choose slot
-      const slotIndex = pickFirstEmptySid();
+
       if (slotIndex === -1) {
         alert("All video slots are in use. Stop a stream to add a new one.");
         return;
@@ -247,6 +249,18 @@ const HomePage: React.FC = () => {
       pollTimers.current[sid] = window.setInterval(async () => {
         try {
           const s = await fetchStats(sid);
+          if (s.status === 'error') {
+            setErrors(prev => prev.map((v, i) => i === slotIndex ? "Stream Error (Check Logs)" : v));
+            setInitState(prev => prev.map((v, i) => i === slotIndex ? false : v));
+            setStreams(prev => {
+              const next = [...prev];
+              next[slotIndex] = { ...next[slotIndex], isInferencing: false };
+              return next;
+            });
+            window.clearInterval(pollTimers.current[sid]);
+            return;
+          }
+
           // convert backend counts -> VehicleCount[]
           const counts = s.counts || {};
           const breakdown: VehicleCount[] = [
@@ -279,7 +293,7 @@ const HomePage: React.FC = () => {
       console.error(err);
       alert(err.message || "Failed to start stream");
       // turn off loader for the (attempted) slot
-      setInitState(prev => prev.map((v, i) => i === 0 ? false : v));
+      setInitState(prev => prev.map((v, i) => i === slotIndex ? false : v));
     }
   };
 
@@ -322,7 +336,7 @@ const HomePage: React.FC = () => {
 
     // best-effort stop all
     for (const s of streams) {
-      try { await stopStream(s.sid); } catch {}
+      try { await stopStream(s.sid); } catch { }
     }
 
     setStreams([...Array(4)].map((_, i) => ({ url: null, isInferencing: false, sid: i + 1 })));

@@ -72,85 +72,113 @@ class StreamSession:
         self.stop_event.clear()
         self._reset()
 
-        with self.stats_lock:
-            self.stats.update({"status":"starting","model_file":model_file,"source":source})
-
-        model_path = os.path.join(MODELS_DIR, model_file)
-        model = YOLO(model_path)
-
-        # detect if local upload
-        if os.path.exists(source) and source.startswith(UPLOAD_DIR):
-            self.local_upload_path = source
-        else:
-            self.local_upload_path = None
-
-        cap, via = open_source(source)
-        if cap is None:
-            with self.stats_lock:
-                self.stats["status"] = "failed_open"
-            return
-
-        with self.stats_lock:
-            self.stats["resolved_via"] = via
-            self.stats["status"] = "running"
-
-        input_fps = cap.get(cv2.CAP_PROP_FPS) or 0.0
-        with self.stats_lock:
-            self.stats["fps_in"] = float(input_fps)
-
-        t0 = time.time()
-        proc = 0
-        frame_idx = 0
-
-        while not self.stop_event.is_set():
-            ok, frame = cap.read()
-            if not ok:
-                break
-            frame_idx += 1
-
-            proc += 1
-            if proc % 20 == 0:
-                dt = time.time() - t0
-                with self.stats_lock:
-                    self.stats["fps_proc"] = proc / dt if dt > 0 else 0.0
-
-            # skip frames if interval > 1
-            if interval > 1 and (frame_idx % interval != 0):
-                ok_raw, jpg_raw = cv2.imencode(".jpg", frame)
-                if ok_raw and not self.frame_q.full():
-                    self.frame_q.put(jpg_raw.tobytes())
-                continue
-
-            res = model.predict(source=frame, conf=conf, imgsz=imgsz, verbose=False)[0]
-            dets = sv.Detections.from_ultralytics(res)
-            tracks = self.tracker.update_with_detections(dets)
-            class_names = res.names if hasattr(res, "names") else {}
-            self._update_counts(tracks, class_names)
-
-            plotted = res.plot()
-            ok2, jpg = cv2.imencode(".jpg", plotted)
-            if ok2 and not self.frame_q.full():
-                self.frame_q.put(jpg.tobytes())
-
-            with self.stats_lock:
-                self.stats["frames"] += 1
+        print(f"[StreamSession {self.sid}] Starting run. Model: {model_file}, Source: {source}")
 
         try:
+            with self.stats_lock:
+                self.stats.update({"status":"starting","model_file":model_file,"source":source})
+
+            model_path = os.path.join(MODELS_DIR, model_file)
+            print(f"[StreamSession {self.sid}] Loading model from {model_path}...")
+            if not os.path.exists(model_path):
+                 raise FileNotFoundError(f"Model file not found: {model_path}")
+            
+            model = YOLO(model_path)
+            print(f"[StreamSession {self.sid}] Model loaded.")
+
+            # detect if local upload
+            if os.path.exists(source) and source.startswith(UPLOAD_DIR):
+                self.local_upload_path = source
+            else:
+                self.local_upload_path = None
+
+            print(f"[StreamSession {self.sid}] Opening source: {source}")
+            cap, via = open_source(source)
+            if cap is None:
+                print(f"[StreamSession {self.sid}] Failed to open source.")
+                with self.stats_lock:
+                    self.stats["status"] = "failed_open"
+                return
+
+            with self.stats_lock:
+                self.stats["resolved_via"] = via
+                self.stats["status"] = "running"
+
+            input_fps = cap.get(cv2.CAP_PROP_FPS) or 0.0
+            print(f"[StreamSession {self.sid}] Source opened. FPS: {input_fps}")
+            with self.stats_lock:
+                self.stats["fps_in"] = float(input_fps)
+
+            t0 = time.time()
+            proc = 0
+            frame_idx = 0
+
+            while not self.stop_event.is_set():
+                ok, frame = cap.read()
+                if not ok:
+                    print(f"[StreamSession {self.sid}] Stream ended (no more frames).")
+                    break
+                frame_idx += 1
+
+                proc += 1
+                if proc % 20 == 0:
+                    dt = time.time() - t0
+                    fps_proc = proc / dt if dt > 0 else 0.0
+                    with self.stats_lock:
+                        self.stats["fps_proc"] = fps_proc
+                    # print(f"[StreamSession {self.sid}] Proc FPS: {fps_proc:.2f}")
+
+                # skip frames if interval > 1
+                if interval > 1 and (frame_idx % interval != 0):
+                    ok_raw, jpg_raw = cv2.imencode(".jpg", frame)
+                    if ok_raw and not self.frame_q.full():
+                        self.frame_q.put(jpg_raw.tobytes())
+                    continue
+
+                res = model.predict(source=frame, conf=conf, imgsz=imgsz, verbose=False)[0]
+                dets = sv.Detections.from_ultralytics(res)
+                tracks = self.tracker.update_with_detections(dets)
+                class_names = res.names if hasattr(res, "names") else {}
+                self._update_counts(tracks, class_names)
+
+                plotted = res.plot()
+                ok2, jpg = cv2.imencode(".jpg", plotted)
+                if ok2 and not self.frame_q.full():
+                    self.frame_q.put(jpg.tobytes())
+
+                with self.stats_lock:
+                    self.stats["frames"] += 1
+            
             cap.release()
-        except Exception:
-            pass
+            with self.stats_lock:
+                self.stats["status"] = "stopped"
 
-        with self.stats_lock:
-            self.stats["status"] = "stopped"
-
-        # Auto-delete uploaded local file (storage-friendly)
-        if self.local_upload_path and os.path.exists(self.local_upload_path):
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            print(f"[StreamSession {self.sid}] CRITICAL ERROR: {e}")
+            with self.stats_lock:
+                self.stats["status"] = "error"
+                # Store error message in stats if possible, or just log it
+        
+        finally:
+            # Cleanup
+            print(f"[StreamSession {self.sid}] Cleaning up.")
             try:
-                os.remove(self.local_upload_path)
-            except Exception as e:
-                print("Auto-delete upload failed:", e)
+                if 'cap' in locals() and cap:
+                   cap.release()
+            except: pass
 
-        del model
+            if 'model' in locals():
+                del model
+
+            # Auto-delete uploaded local file (storage-friendly)
+            if self.local_upload_path and os.path.exists(self.local_upload_path):
+                try:
+                    os.remove(self.local_upload_path)
+                    print(f"[StreamSession {self.sid}] Deleted temp file: {self.local_upload_path}")
+                except Exception as e:
+                    print("Auto-delete upload failed:", e)
 
     def start(self, model_file, source, conf, imgsz, interval):
         if self.thread and self.thread.is_alive():
