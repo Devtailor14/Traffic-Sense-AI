@@ -1,4 +1,5 @@
-export const API_BASE = "http://localhost:5000";
+/// <reference types="vite/client" />
+export const API_BASE = import.meta.env.PROD ? "" : "http://localhost:5000";
 
 /* -------------------- MODELS -------------------- */
 
