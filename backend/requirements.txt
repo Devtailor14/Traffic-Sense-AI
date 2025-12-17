@@ -2,3 +2,5 @@ flask
 flask-cors
 ultralytics
 opencv-python
+supervision
+yt-dlp
